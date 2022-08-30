@@ -6,7 +6,30 @@ of time series data
 import numpy as np
 
 from ripser import Rips
-from persim import wasserstein
+from persim import bottleneck ,wasserstein
+
+def bottleneck_distance(
+    diagram_i, diagram_j, matching: bool=False
+) -> float:
+
+    """
+    Compute bottleneck distance between two persistence
+    diagrams
+
+    INPUT:
+    diagram_i, diagram_j: input persistence diagrams 
+        to compute wasserstein distance from 
+
+    OUTPUT
+    distance: bottleneck distance between input diagrams
+    """
+
+    distance = bottleneck(
+        dgm1=diagram_i, dgm2=diagram_j, matching=matching
+        )
+
+    return distance
+
 
 def wasserstein_distance(
     diagram_i, diagram_j, matching: bool=False
@@ -21,14 +44,14 @@ def wasserstein_distance(
         to compute wasserstein distance from 
 
     OUTPUT
-    w_distance: wasserstein distance between input diagrams
+    distance: wasserstein distance between input diagrams
     """
 
-    w_distance = wasserstein(
+    distance = wasserstein(
         dgm1=diagram_i, dgm2=diagram_j, matching=matching
         )
 
-    return w_distance
+    return distance
 
 def pair_wise_distance_matrix(diagrams: list) -> np.array:
 

@@ -4,6 +4,29 @@ from typing import Callable
 
 import numpy as np
 
+
+def random_remove_points(
+    signal_size: int, percentage:float
+)->np.array: 
+    '''
+    Generate mask to randomly remove a desired percentage of points of 
+    points in the signal.
+
+    INPUT:
+    signal_size: number of measurements in the original signal
+    percentage: is the percentage of the data points that we want to
+       remove from the original signal.
+
+    OUTPUT:
+    remove_mask: boolean mask for the removal of elements in the signal
+    '''
+    
+    random_numbers = np.random.random(signal_size)
+    
+    remove_mask = random_numbers > (percentage / 100.) 
+    
+    return remove_mask
+
 def time_series(
     signal_function: Callable,
     period: float,
@@ -11,7 +34,7 @@ def time_series(
     variance: float,
     mean_dt: float,
     irregular_dt: float
-):
+) -> tuple[np.array, np.array, bool]:
     """
     Generate a time series according to input function
     from Xiangyu Jin

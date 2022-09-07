@@ -4,7 +4,6 @@ import numpy as np
 from ripser import ripser
 from scipy import sparse
 
-
 def pd_from_distance_matrix(distance_matrix: sparse.coo_matrix):
 
     dgm_0 = ripser(
@@ -51,3 +50,10 @@ def sparse_matrix_serie(signal: np.array)-> np.array:
     ).tocsr()
     
     return distance_matrix
+
+def pd_time_series(signal):
+    
+    distance_matrix = sparse_matrix_serie(signal)
+    pd = pd_from_distance_matrix(distance_matrix)
+
+    return pd

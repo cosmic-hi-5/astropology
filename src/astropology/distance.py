@@ -3,6 +3,8 @@ Functionality to compute distances between persistence diagrams
 of time series data
 """
 
+import sys
+
 import numpy as np
 
 from ripser import Rips
@@ -53,7 +55,7 @@ def wasserstein_distance(
 
     return distance
 
-def pair_wise_distance_matrix(diagrams: list) -> np.array:
+def pair_wise_distance_matrix(diagrams: list, distance: str) -> np.array:
 
     """
     Compute pair wise distance matrix between all diagrams
@@ -61,7 +63,9 @@ def pair_wise_distance_matrix(diagrams: list) -> np.array:
 
     INPUT
     diagrams: list with persistence diagrams
-        e.g: [diagram_0, ...., diagram_n] 
+        e.g: [diagram_0, ...., diagram_n]
+    distance: distance between persistence diagrams, can be
+        Wassertein or Bottleneck
     
     OUTPUT
     distance_matrix: symmetric matrix with null diagonal
@@ -85,11 +89,24 @@ def pair_wise_distance_matrix(diagrams: list) -> np.array:
                 
             else:
                 # set matching to False to return the
-                # wasserstein distance only
-                distance_ij = wasserstein_distance(
-                    diagram_i, diagram_j, matching=False
-                )
+                # wasserstein/bottlenec distance only
+
+                if distance == "wasserstein":
+                    
+                    distance_ij = wasserstein_distance(
+                        diagram_i, diagram_j, matching=False
+                    )
                 
+                elif distance == "bottleneck":
+
+                    distance_ij = bottleneck_distance(
+                        diagram_i, diagram_j, matching=False
+                    )
+
+                else:
+                    print(f"Not implemented {distance}")
+                    sys.exit()
+
                 distance_matrix[i, j] = distance_ij
                 distance_matrix[j, i] = distance_ij
         

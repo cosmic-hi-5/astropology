@@ -46,13 +46,17 @@ if __name__ == "__main__":
     # Get light curves
     lcs = {}
     mjds = {}
+    # map between index and object_id
+    idx_objid = {}
 
-    for object_id in object_ids:
+    for idx, object_id in enumerate(object_ids):
         
+        idx_objid[f"{idx}"] = object_id
+
         id_mask = object_id == df['object_id']
 
-        lcs[f"{object_id}"] = df.loc[id_mask, "flux"].to_numpy()
-        mjds[f"{object_id}"] = df.loc[id_mask, "mjd"].to_numpy()
+        lcs[f"{idx}"] = df.loc[id_mask, "flux"].to_numpy()
+        mjds[f"{idx}"] = df.loc[id_mask, "mjd"].to_numpy()
 
     keep_negative = parser.getboolean("config", "keep_negative_flux")
 
@@ -61,8 +65,7 @@ if __name__ == "__main__":
         for _, value in lcs.items(): value[value < 0] = 0
 
 
-    # build grid for parallel computations
-    
+    # build grid for parallel computations    
     distance_matrix = RawArray("d", number_series**2)
 
     x = np.arange(number_series)
@@ -74,17 +77,17 @@ if __name__ == "__main__":
 
     number_jobs = parser.getint("config", "number_jobs")
 
+    # add counter
+
+    counter = mp.Value("i", 0)
+
     with mp.Pool(
         processes=number_jobs,
         initializer=share_data,
         initargs=(
-            # counter,
-            4,
+            counter,
             lcs,
-            (
-                distance_matrix,
-                number_series
-            ),
+            (distance_matrix, number_series),
         ),
     ) as pool:
 
@@ -93,4 +96,4 @@ if __name__ == "__main__":
         
     finish_time = time.time()
 
-    print(f"Running time: {finish_time - start_time:.2f}")
+    print(f"\nRunning time: {finish_time - start_time:.2f}")

@@ -7,7 +7,8 @@ import multiprocessing as mp
 from multiprocessing.sharedctypes import RawArray
 import numpy as np
 
-from astropology.distance import pair_wise_distance_matrix
+from astropology.distance import bottleneck_distance
+from astropology.distance import wasserstein_distance
 from astropology.series import pd_time_series
 
 def raw_array_to_numpy(
@@ -28,7 +29,7 @@ def raw_array_to_numpy(
 def share_data(
     shared_counter: mp.Value,
     shared_lcs: dict,
-    shared_matrix:tuple
+    shared_matrix: tuple,
 ):
     
     global lcs
@@ -45,4 +46,35 @@ def share_data(
     )
     
 def fill_distance_matrix(matrix_index: tuple, distance: str):
-    pass
+    
+    with counter.get_lock():
+
+        counter_value = counter.value
+
+        counter.value += 1
+
+        print(
+            f"[{counter_value}] Compute matrix element: {matrix_index}",
+            end="\r"
+        )
+
+    i = matrix_index[0]
+    pdgm_i = pd_time_series(lcs[f"{i}"])
+
+    j = matrix_index[1]
+    pdgm_j = pd_time_series(lcs[f"{j}"])
+
+    # remove point at infinity before computing distances
+    pdgm_i = pdgm_i[np.isfinite(pdgm_i[:, 1]), :]
+    pdgm_j = pdgm_j[np.isfinite(pdgm_j[:, 1]), :]
+
+    if distance == "wasserstein":
+
+        d_ij = wasserstein_distance(pdgm_i, pdgm_j)
+
+    elif distance == "bottleneck":
+        
+        d_ij = bottleneck_distance(pdgm_i, pdgm_j)
+    
+    matrix_distance[j, i] = d_ij
+    matrix_distance[i, j] = d_ij

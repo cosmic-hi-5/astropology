@@ -9,7 +9,9 @@ import numpy as np
 import pandas as pd
 
 from astropology.parrallel import fill_distance_matrix
+from astropology.parrallel import raw_array_to_numpy
 from astropology.parrallel import share_data
+
 
 PASSBANDS = {"u":0, "g":1, "r":2, "i":3, "z":4, "y":5}
 
@@ -66,7 +68,7 @@ if __name__ == "__main__":
 
 
     # build grid for parallel computations    
-    distance_matrix = RawArray("d", number_series**2)
+    matrix_distance = RawArray("d", number_series**2)
 
     x = np.arange(number_series)
     matrix_ij_grid = [(i, j) for i in x for j in x if j>i]
@@ -87,11 +89,17 @@ if __name__ == "__main__":
         initargs=(
             counter,
             lcs,
-            (distance_matrix, number_series),
+            (matrix_distance, number_series),
         ),
     ) as pool:
 
         pool.map(worker, matrix_ij_grid)
+
+    matrix_distance = raw_array_to_numpy(
+        matrix_distance, (number_series, number_series)
+    )
+
+    np.save(f"{data_directory}/{distance}_matrix.npy", matrix_distance)
 
         
     finish_time = time.time()

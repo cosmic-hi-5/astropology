@@ -41,34 +41,64 @@ if __name__ == "__main__":
 
     object_ids = np.unique(df["object_id"])
 
-    if isinstance(number_series, int):
+    if number_series != -1:
         
         object_ids = object_ids[: number_series]
 
+    else:
+
+        number_series = object_ids.size
+    print(f"Compute distances for {number_series} series\n")
     # Get light curves
     lcs = {}
     mjds = {}
     # map between index and object_id
-    idx_objid = {}
+    idx_objid = np.empty((number_series, 2))
 
     for idx, object_id in enumerate(object_ids):
         
-        idx_objid[f"{idx}"] = object_id
+        # idx_objid[f"{idx}"] = object_id
+        idx_objid[idx, 0] = idx 
+        idx_objid[idx, 1] = object_id
 
         id_mask = object_id == df['object_id']
 
         lcs[f"{idx}"] = df.loc[id_mask, "flux"].to_numpy()
         mjds[f"{idx}"] = df.loc[id_mask, "mjd"].to_numpy()
 
+    # Some preprocessing
+
+    # Normalize
+    normalization = parser.get("config", "normalization")
+    
+    if normalization == "mean":
+
+        for _, value in lcs.items(): value *= np.nanmean(value)
+        
+
+    elif normalization == "median":
+
+        for _, value in lcs.items(): value *= np.nanmedian(value)
+
+    elif normalization == "no":
+
+        pass
+
+    else:
+
+        print(f"Normalization  {normalization} not defined")
+
+
     keep_negative = parser.getboolean("config", "keep_negative_flux")
 
+    # Negative fluxes
     if keep_negative is False:
 
         for _, value in lcs.items(): value[value < 0] = 0
 
-
-    # build grid for parallel computations    
-    matrix_distance = RawArray("d", number_series**2)
+    # build grid for parallel computations
+    # "f" means float32
+    matrix_distance = RawArray("f", number_series**2)
 
     x = np.arange(number_series)
     matrix_ij_grid = [(i, j) for i in x for j in x if j>i]
@@ -98,8 +128,26 @@ if __name__ == "__main__":
     matrix_distance = raw_array_to_numpy(
         matrix_distance, (number_series, number_series)
     )
+    
+    save_to = parser.get("directory", "save_to")
 
-    np.save(f"{data_directory}/{distance}_matrix.npy", matrix_distance)
+    matrix_name = (
+        f"{distance}_series_{number_series}_norm_{normalization}"
+        f"{band}_band"
+    )
+
+    if keep_negative is True:
+        matrix_name = f"{matrix_name}_keep_negative"
+    
+    np.save(
+        f"{data_directory}/{matrix_name}.npy",
+        matrix_distance
+    )
+
+    np.save(
+        f"{data_directory}/objid_{matrix_name}.npy",
+        idx_objid
+    )
 
         
     finish_time = time.time()

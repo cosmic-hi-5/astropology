@@ -32,22 +32,22 @@ def share_data(
     shared_lcs: dict,
     shared_matrix: tuple,
 ):
-    
+
     global lcs
     global counter
     global matrix_distance
 
     lcs = shared_lcs
-    
+
     counter = shared_counter
 
     matrix_distance = raw_array_to_numpy(
         array=shared_matrix[0],
         array_shape= (shared_matrix[1], shared_matrix[1])
     )
-    
+
 def fill_distance_matrix(matrix_index: tuple, distance: str):
-    
+
     with counter.get_lock():
 
         counter_value = counter.value
@@ -71,27 +71,27 @@ def fill_distance_matrix(matrix_index: tuple, distance: str):
 
     if distance == "wasserstein":
 
-        try: 
-            
+        try:
+
             d_ij = wasserstein_distance(pdgm_i, pdgm_j)
 
         except IndexError:
 
-            print(f"IndexError at pdgms{matrix_index}")
+            print(f"\nIndexError at pdgms: {matrix_index}\n")
 
-            sys.exit()
+            d_ij = np.nan
 
     elif distance == "bottleneck":
-        
+
         try:
-            
+
             d_ij = bottleneck_distance(pdgm_i, pdgm_j)
-        
+
         except IndexError:
 
-            print(f"IndexError at pdgms{matrix_index}")
+            print(f"\nIndexError at pdgms: {matrix_index}\n")
 
-            sys.exit()
-    
+            d_ij = np.nan
+
     matrix_distance[j, i] = d_ij
     matrix_distance[i, j] = d_ij

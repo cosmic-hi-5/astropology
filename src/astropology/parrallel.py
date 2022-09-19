@@ -6,6 +6,7 @@ spectra using cpu parallelization
 import multiprocessing as mp
 from multiprocessing.sharedctypes import RawArray
 import numpy as np
+import sys
 
 from astropology.distance import bottleneck_distance
 from astropology.distance import wasserstein_distance
@@ -70,11 +71,27 @@ def fill_distance_matrix(matrix_index: tuple, distance: str):
 
     if distance == "wasserstein":
 
-        d_ij = wasserstein_distance(pdgm_i, pdgm_j)
+        try: 
+            
+            d_ij = wasserstein_distance(pdgm_i, pdgm_j)
+
+        except IndexError:
+
+            print(f"IndexError at pdgms{matrix_index}")
+
+            sys.exit()
 
     elif distance == "bottleneck":
         
-        d_ij = bottleneck_distance(pdgm_i, pdgm_j)
+        try:
+            
+            d_ij = bottleneck_distance(pdgm_i, pdgm_j)
+        
+        except IndexError:
+
+            print(f"IndexError at pdgms{matrix_index}")
+
+            sys.exit()
     
     matrix_distance[j, i] = d_ij
     matrix_distance[i, j] = d_ij

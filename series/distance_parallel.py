@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
     mp.set_start_method("spawn", force=True)
 
-    start_time = time.time()
+    start_time = time.perf_counter()
     
     # Configuration File
     parser = ConfigParser(interpolation=ExtendedInterpolation())
@@ -48,7 +48,6 @@ if __name__ == "__main__":
     else:
 
         number_series = object_ids.size
-    print(f"Compute distances for {number_series} series\n")
     # Get light curves
     lcs = {}
     mjds = {}
@@ -104,6 +103,7 @@ if __name__ == "__main__":
     matrix_ij_grid = [(i, j) for i in x for j in x if j>i]
 
     distance = parser.get("config", "distance")
+    print(f"Compute {distance} distances for {number_series} series\n")
 
     worker = partial(fill_distance_matrix, distance=distance)
 
@@ -112,7 +112,9 @@ if __name__ == "__main__":
     # add counter
 
     counter = mp.Value("i", 0)
-
+    
+    parallel_start_time = time.perf_counter()
+    
     with mp.Pool(
         processes=number_jobs,
         initializer=share_data,
@@ -127,6 +129,13 @@ if __name__ == "__main__":
 
     matrix_distance = raw_array_to_numpy(
         matrix_distance, (number_series, number_series)
+    )
+
+    parallel_finish_time = time.perf_counter()
+
+    print(
+        f"\nPool of workers took:"
+        f"{parallel_finish_time-parallel_start_time:2f}\n"
     )
     
     save_to = parser.get("directory", "save_to")
@@ -150,6 +159,6 @@ if __name__ == "__main__":
     )
 
         
-    finish_time = time.time()
+    finish_time = time.perf_counter()
 
     print(f"\nRunning time: {finish_time - start_time:.2f}")

@@ -22,16 +22,16 @@ if __name__ == "__main__":
     mp.set_start_method("spawn", force=True)
 
     start_time = time.perf_counter()
-    
+
     # Configuration File
     parser = ConfigParser(interpolation=ExtendedInterpolation())
     config_file_name = "distance_parallel.ini"
     parser.read(f"{config_file_name}")
-    
+
     # Load data
     data_directory = parser.get("directory", "data")
     data_name = parser.get("file", "data")
-    
+
     df = pd.read_csv(f"{data_directory}/{data_name}")
 
 
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     object_ids = np.unique(df["object_id"])
 
     if number_series != -1:
-        
+
         object_ids = object_ids[: number_series]
 
     else:
@@ -57,9 +57,9 @@ if __name__ == "__main__":
     idx_objid = np.empty((number_series, 2))
 
     for idx, object_id in enumerate(object_ids):
-        
+
         # idx_objid[f"{idx}"] = object_id
-        idx_objid[idx, 0] = idx 
+        idx_objid[idx, 0] = idx
         idx_objid[idx, 1] = object_id
 
         id_mask = object_id == df['object_id']
@@ -78,19 +78,19 @@ if __name__ == "__main__":
 
     # Normalize
     normalization = parser.get("config", "normalization")
-    
+
     if normalization == "mean":
 
         for _, value in lcs.items():
-            
+
             value *= np.nanmean(np.abs(value))
-        
+
 
     elif normalization == "median":
 
         for _, value in lcs.items():
-            
-            value *= np.abs(np.nanmedian(np.abs(value)))
+
+            value *= np.nanmedian(np.abs(value))
 
     elif normalization == "no":
 

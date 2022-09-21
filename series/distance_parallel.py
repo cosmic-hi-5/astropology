@@ -1,8 +1,10 @@
 "Compute distance matrix time series data in parallel"
+
 from configparser import ConfigParser, ExtendedInterpolation
 from functools import partial
 import multiprocessing as mp
 from multiprocessing.sharedctypes import RawArray
+import sys
 import time
 
 import numpy as np
@@ -67,17 +69,28 @@ if __name__ == "__main__":
 
     # Some preprocessing
 
+    # Negative fluxes
+    keep_negative = parser.getboolean("config", "keep_negative_flux")
+
+    if keep_negative is False:
+
+        for _, value in lcs.items(): value[value < 0] = 0
+
     # Normalize
     normalization = parser.get("config", "normalization")
     
     if normalization == "mean":
 
-        for _, value in lcs.items(): value *= np.nanmean(value)
+        for _, value in lcs.items():
+            
+            value *= np.nanmean(np.abs(value))
         
 
     elif normalization == "median":
 
-        for _, value in lcs.items(): value *= np.nanmedian(value)
+        for _, value in lcs.items():
+            
+            value *= np.abs(np.nanmedian(np.abs(value)))
 
     elif normalization == "no":
 
@@ -86,14 +99,9 @@ if __name__ == "__main__":
     else:
 
         print(f"Normalization  {normalization} not defined")
+        sys.exit()
 
 
-    keep_negative = parser.getboolean("config", "keep_negative_flux")
-
-    # Negative fluxes
-    if keep_negative is False:
-
-        for _, value in lcs.items(): value[value < 0] = 0
 
     # build grid for parallel computations
     # "f" means float32
@@ -141,7 +149,7 @@ if __name__ == "__main__":
     save_to = parser.get("directory", "save_to")
 
     matrix_name = (
-        f"{distance}_series_{number_series}_norm_{normalization}"
+        f"{distance}_series_{number_series}_norm_{normalization}_"
         f"{band}_band"
     )
 

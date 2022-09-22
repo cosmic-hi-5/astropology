@@ -83,14 +83,14 @@ if __name__ == "__main__":
 
         for _, value in lcs.items():
 
-            value *= np.nanmean(np.abs(value))
+            value *= 1/np.nanmean(np.abs(value))
 
 
     elif normalization == "median":
 
         for _, value in lcs.items():
 
-            value *= np.nanmedian(np.abs(value))
+            value *= 1/np.nanmedian(np.abs(value))
 
     elif normalization == "no":
 
@@ -120,9 +120,9 @@ if __name__ == "__main__":
     # add counter
 
     counter = mp.Value("i", 0)
-    
+
     parallel_start_time = time.perf_counter()
-    
+
     with mp.Pool(
         processes=number_jobs,
         initializer=share_data,
@@ -145,7 +145,7 @@ if __name__ == "__main__":
         f"\nPool of workers took:"
         f"{parallel_finish_time-parallel_start_time:2f}\n"
     )
-    
+
     save_to = parser.get("directory", "save_to")
 
     matrix_name = (
@@ -155,7 +155,7 @@ if __name__ == "__main__":
 
     if keep_negative is True:
         matrix_name = f"{matrix_name}_keep_negative"
-    
+
     np.save(
         f"{data_directory}/{matrix_name}.npy",
         matrix_distance
@@ -166,7 +166,7 @@ if __name__ == "__main__":
         idx_objid
     )
 
-        
+
     finish_time = time.perf_counter()
 
     print(f"\nRunning time: {finish_time - start_time:.2f}")

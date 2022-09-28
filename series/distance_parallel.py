@@ -10,12 +10,18 @@ import time
 import numpy as np
 import pandas as pd
 
+from astropology.constants import PASSBANDS
 from astropology.parrallel import fill_distance_matrix
 from astropology.parrallel import raw_array_to_numpy
 from astropology.parrallel import share_data
 
+mean_norm = lambda flux: flux / np.nanmean(np.abs(flux))
+max_norm = lambda flux: flux / np.nanmax(np.abs(flux))
+min_max_norm = lambda flux: flux / (np.nanmax(flux) - np.nanmin(flux))
 
-PASSBANDS = {"u":0, "g":1, "r":2, "i":3, "z":4, "y":5}
+f_normalization = {
+    "mean": mean_norm, "max": max_norm, "min_max": min_max_norm
+}
 
 if __name__ == "__main__":
 
@@ -45,6 +51,7 @@ if __name__ == "__main__":
 
     if number_series != -1:
 
+        np.random.shuffle(object_ids)
         object_ids = object_ids[: number_series]
 
     else:
@@ -52,7 +59,6 @@ if __name__ == "__main__":
         number_series = object_ids.size
     # Get light curves
     lcs = {}
-    mjds = {}
     # map between index and object_id
     idx_objid = np.empty((number_series, 2))
 
@@ -65,42 +71,26 @@ if __name__ == "__main__":
         id_mask = object_id == df['object_id']
 
         lcs[f"{idx}"] = df.loc[id_mask, "flux"].to_numpy()
-        mjds[f"{idx}"] = df.loc[id_mask, "mjd"].to_numpy()
 
     # Some preprocessing
-
     # Negative fluxes
-    keep_negative = parser.getboolean("config", "keep_negative_flux")
+    mask_negative = parser.getboolean("config", "mask_negative_flux")
 
-    if keep_negative is False:
+    if mask_negative is True:
 
-        for _, value in lcs.items(): value[value < 0] = 0
+        for _, value in lcs.items():
+            value = value[value >= 0]
 
     # Normalize
     normalization = parser.get("config", "normalization")
 
-    if normalization == "mean":
+    if normalization != "no":
+
+        assert normalization in f_normalization.keys()
 
         for _, value in lcs.items():
 
-            value *= 1/np.nanmean(np.abs(value))
-
-
-    elif normalization == "median":
-
-        for _, value in lcs.items():
-
-            value *= 1/np.nanmedian(np.abs(value))
-
-    elif normalization == "no":
-
-        pass
-
-    else:
-
-        print(f"Normalization  {normalization} not defined")
-        sys.exit()
-
+            value = f_normalization[normalization](value)
 
 
     # build grid for parallel computations
@@ -153,7 +143,7 @@ if __name__ == "__main__":
         f"{band}_band"
     )
 
-    if keep_negative is True:
+    if mask_negative is True:
         matrix_name = f"{matrix_name}_keep_negative"
 
     np.save(

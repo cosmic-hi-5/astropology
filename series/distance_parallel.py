@@ -144,7 +144,7 @@ if __name__ == "__main__":
     )
 
     if mask_negative is True:
-        matrix_name = f"{matrix_name}_keep_negative"
+        matrix_name = f"{matrix_name}_mask_negative"
 
     np.save(
         f"{data_directory}/{matrix_name}.npy",

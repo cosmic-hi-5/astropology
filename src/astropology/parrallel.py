@@ -60,10 +60,10 @@ def fill_distance_matrix(matrix_index: tuple, distance: str):
         )
 
     i = matrix_index[0]
-    pdgm_i = pd_time_series(lcs[f"{i}"])
+    pdgm_i = pd_time_series(lcs[i])
 
     j = matrix_index[1]
-    pdgm_j = pd_time_series(lcs[f"{j}"])
+    pdgm_j = pd_time_series(lcs[j])
 
     # remove point at infinity before computing distances
     pdgm_i = pdgm_i[np.isfinite(pdgm_i[:, 1]), :]

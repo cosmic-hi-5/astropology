@@ -70,7 +70,7 @@ if __name__ == "__main__":
 
         id_mask = object_id == df['object_id']
 
-        lcs[f"{idx}"] = df.loc[id_mask, "flux"].to_numpy()
+        lcs[idx] = df.loc[id_mask, "flux"].to_numpy()
 
     # Some preprocessing
     # Negative fluxes
@@ -78,8 +78,10 @@ if __name__ == "__main__":
 
     if mask_negative is True:
 
-        for _, value in lcs.items():
+        for key, value in lcs.items():
+            
             value = value[value >= 0]
+            lcs[key] = value            
 
     # Normalize
     normalization = parser.get("config", "normalization")
@@ -88,9 +90,10 @@ if __name__ == "__main__":
 
         assert normalization in f_normalization.keys()
 
-        for _, value in lcs.items():
+        for key, value in lcs.items():
 
             value = f_normalization[normalization](value)
+            lcs[key] = value
 
 
     # build grid for parallel computations

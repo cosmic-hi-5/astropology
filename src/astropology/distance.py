@@ -26,8 +26,8 @@ def bottleneck_distance(
     distance: bottleneck distance between input diagrams
     """
     # remove point at infinity before computing distances
-    pdgm_i = pdgm_i[np.isfinite(pdgm_i[:, 1]), :]
-    pdgm_j = pdgm_j[np.isfinite(pdgm_j[:, 1]), :]
+    diagram_i = diagram_i[np.isfinite(diagram_i[:, 1]), :]
+    diagram_j = diagram_j[np.isfinite(diagram_j[:, 1]), :]
 
     distance = bottleneck(
         dgm1=diagram_i, dgm2=diagram_j, matching=matching
@@ -51,8 +51,8 @@ def wasserstein_distance(
     distance: wasserstein distance between input diagrams
     """
     # remove point at infinity before computing distances
-    pdgm_i = pdgm_i[np.isfinite(pdgm_i[:, 1]), :]
-    pdgm_j = pdgm_j[np.isfinite(pdgm_j[:, 1]), :]
+    diagram_i = diagram_i[np.isfinite(diagram_i[:, 1]), :]
+    diagram_j = diagram_j[np.isfinite(diagram_j[:, 1]), :]
 
     distance = wasserstein(
         dgm1=diagram_i, dgm2=diagram_j, matching=matching

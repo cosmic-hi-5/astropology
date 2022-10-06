@@ -10,7 +10,7 @@ import sys
 
 from astropology.distance import bottleneck_distance
 from astropology.distance import wasserstein_distance
-from astropology.series import pd_time_series
+from astropology.series import pd_signal
 
 def raw_array_to_numpy(
     array: RawArray, array_shape: tuple=None
@@ -60,10 +60,10 @@ def fill_distance_matrix(matrix_index: tuple, distance: str):
         )
 
     i = matrix_index[0]
-    pdgm_i = pd_time_series(lcs[i])
+    pdgm_i = pd_signal(lcs[i])
 
     j = matrix_index[1]
-    pdgm_j = pd_time_series(lcs[j])
+    pdgm_j = pd_signal(lcs[j])
 
     # remove point at infinity before computing distances
     pdgm_i = pdgm_i[np.isfinite(pdgm_i[:, 1]), :]

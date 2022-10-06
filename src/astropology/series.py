@@ -51,7 +51,7 @@ def sparse_matrix_serie(signal: np.array)-> np.array:
     
     return distance_matrix
 
-def pd_time_series(signal):
+def pd_signal(signal):
     
     distance_matrix = sparse_matrix_serie(signal)
     pd = pd_from_distance_matrix(distance_matrix)

@@ -7,7 +7,6 @@ import sys
 
 import numpy as np
 
-from ripser import Rips
 from persim import bottleneck ,wasserstein
 
 def bottleneck_distance(

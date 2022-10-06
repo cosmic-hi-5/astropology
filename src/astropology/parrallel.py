@@ -10,7 +10,7 @@ import sys
 
 from astropology.distance import bottleneck_distance
 from astropology.distance import wasserstein_distance
-from astropology.series import pd_signal
+from astropology.signal import pd_signal
 
 def raw_array_to_numpy(
     array: RawArray, array_shape: tuple=None

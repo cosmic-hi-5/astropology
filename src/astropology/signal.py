@@ -12,7 +12,7 @@ def pd_from_distance_matrix(distance_matrix: sparse.coo_matrix):
 
     return dgm_0
 
-def sparse_matrix_serie(signal: np.array)-> np.array:
+def sparse_matrix_signal(signal: np.array)-> np.array:
 
     """
     Compute distance matrix asociated to the time serie.
@@ -51,9 +51,9 @@ def sparse_matrix_serie(signal: np.array)-> np.array:
     
     return distance_matrix
 
-def pd_time_series(signal):
+def pd_signal(signal):
     
-    distance_matrix = sparse_matrix_serie(signal)
+    distance_matrix = sparse_matrix_signal(signal)
     pd = pd_from_distance_matrix(distance_matrix)
 
     return pd

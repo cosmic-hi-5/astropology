@@ -7,7 +7,6 @@ import sys
 
 import numpy as np
 
-from ripser import Rips
 from persim import bottleneck ,wasserstein
 
 def bottleneck_distance(
@@ -25,13 +24,15 @@ def bottleneck_distance(
     OUTPUT
     distance: bottleneck distance between input diagrams
     """
+    # remove point at infinity before computing distances
+    diagram_i = diagram_i[np.isfinite(diagram_i[:, 1]), :]
+    diagram_j = diagram_j[np.isfinite(diagram_j[:, 1]), :]
 
     distance = bottleneck(
         dgm1=diagram_i, dgm2=diagram_j, matching=matching
         )
 
     return distance
-
 
 def wasserstein_distance(
     diagram_i, diagram_j, matching: bool=False
@@ -48,6 +49,9 @@ def wasserstein_distance(
     OUTPUT
     distance: wasserstein distance between input diagrams
     """
+    # remove point at infinity before computing distances
+    diagram_i = diagram_i[np.isfinite(diagram_i[:, 1]), :]
+    diagram_j = diagram_j[np.isfinite(diagram_j[:, 1]), :]
 
     distance = wasserstein(
         dgm1=diagram_i, dgm2=diagram_j, matching=matching

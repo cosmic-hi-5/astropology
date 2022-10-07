@@ -65,10 +65,6 @@ def fill_distance_matrix(matrix_index: tuple, distance: str):
     j = matrix_index[1]
     pdgm_j = pd_signal(lcs[j])
 
-    # remove point at infinity before computing distances
-    pdgm_i = pdgm_i[np.isfinite(pdgm_i[:, 1]), :]
-    pdgm_j = pdgm_j[np.isfinite(pdgm_j[:, 1]), :]
-
     if distance == "wasserstein":
 
         try:

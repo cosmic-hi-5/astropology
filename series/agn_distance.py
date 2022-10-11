@@ -41,7 +41,8 @@ if __name__ == "__main__":
 
     object_ids = np.empty(number_series)
 
-    lcs = {}
+    lcs = mp.Manager().dict()
+    # lcs = {}
 
     for idx, f_name in enumerate(f_names):
 

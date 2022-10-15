@@ -95,7 +95,7 @@ def fill_distance_matrix(matrix_index: tuple, distance: str):
 
 def share_spectra(
     shared_counter: mp.Value,
-    shared_spectra: tuple[str, RawArray, int],
+    shared_spectra: tuple[str, RawArray, int, int],
     shared_matrix: tuple[RawArray, int],
 ):
 
@@ -103,14 +103,12 @@ def share_spectra(
     global counter
     global matrix_distance
 
-    spectra = shared_spectra
-
     spectra = raw_array_to_numpy(
         array=shared_spectra[1],
-        array_shape= (shared_matrix[2], shared_matrix[2])
+        array_shape= (shared_spectra[2], shared_spectra[3])
     )
 
-    spectra[:] = np.load(shared_spectra[0])
+    spectra[...] = np.load(shared_spectra[0])
 
     counter = shared_counter
 

@@ -25,19 +25,28 @@ if __name__ == "__main__":
     config_file_name = "sdss_distance.ini"
     parser.read(f"{config_file_name}")
 
-    # Load data
+    print("Load data")
+
     data_directory = parser.get("directory", "data")
     data_name = parser.get("file", "data")
-    
+
     # share array of spectra
     number_spectra, number_waves = np.load(
         f"{data_directory}/{data_name}",
         mmap_mode="r"
     ).shape
 
+    parser_n_spectra = parser.getint("config", "number_spectra")
+
+    if parser_n_spectra != -1:
+
+        number_spectra = parser_n_spectra
+
+    print("Set shared memory")
+
     # "f" means float32
     spectra = RawArray("f", number_spectra*number_waves)
-    
+
     # build grid for parallel computations
     matrix_distance = RawArray("f", number_spectra**2)
 
@@ -55,6 +64,8 @@ if __name__ == "__main__":
 
     counter = mp.Value("i", 0)
 
+    print("Start pool of workers")
+
     parallel_start_time = time.perf_counter()
 
     with mp.Pool(
@@ -62,7 +73,7 @@ if __name__ == "__main__":
         initializer=share_spectra,
         initargs=(
             counter,
-            (f"{data_directory}/{data_name}", spectra, number_spectra),
+            (f"{data_directory}/{data_name}", spectra, number_spectra, number_waves),
             (matrix_distance, number_spectra),
         ),
     ) as pool:

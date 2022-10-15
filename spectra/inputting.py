@@ -23,9 +23,12 @@ spectra_df_name = parser.get("files", "spectra_df")
 spectra_df = pd.read_csv(
     f"{data_directory}/{spectra_df_name}", index_col="specobjid"
 )
-# Load interpolated spectra
+
+print("Load spectra and objectids")
+
 spectra_file_name = parser.get("files", "spectra")
 spectra = np.load(f"{data_directory}/{spectra_file_name}")
+
 # Load indexes and specobjid of interpolated spectra
 ids_file_name = parser.get("files", "ids")
 track_indexes = np.load(f"{data_directory}/{ids_file_name}")
@@ -64,7 +67,7 @@ np.save(f"{data_directory}/ids_inputting.npy", track_indexes)
 variance_of_spectra = variance_of_spectra[keep_spectra_mask]
 
 # update meta data with remaining galaxies
-spectra_df = spectra_df.loc[specobjids[:, 0]]
+spectra_df = spectra_df.loc[specobjids]
 spectra_df.to_csv(f"{data_directory}/drop_{spectra_df_name}")
 
 number_indefinite_values = np.count_nonzero(~np.isfinite(spectra))

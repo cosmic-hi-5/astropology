@@ -91,3 +91,74 @@ def fill_distance_matrix(matrix_index: tuple, distance: str):
 
     matrix_distance[j, i] = d_ij
     matrix_distance[i, j] = d_ij
+
+
+def share_spectra(
+    shared_counter: mp.Value,
+    shared_spectra: tuple[str, RawArray, int, int],
+    shared_matrix: tuple[RawArray, int],
+):
+
+    global spectra
+    global counter
+    global matrix_distance
+
+    spectra = raw_array_to_numpy(
+        array=shared_spectra[1],
+        array_shape= (shared_spectra[2], shared_spectra[3])
+    )
+
+    spectra[...] = np.load(shared_spectra[0])
+
+    counter = shared_counter
+
+    matrix_distance = raw_array_to_numpy(
+        array=shared_matrix[0],
+        array_shape= (shared_matrix[1], shared_matrix[1])
+    )
+
+def fill_spectra_distance(matrix_index: tuple, distance: str):
+
+    with counter.get_lock():
+
+        counter_value = counter.value
+
+        counter.value += 1
+
+        print(
+            f"[{counter_value}] Compute matrix element: {matrix_index}",
+            end="\r"
+        )
+
+    i = matrix_index[0]
+    pdgm_i = pd_signal(spectra[i])
+
+    j = matrix_index[1]
+    pdgm_j = pd_signal(spectra[j])
+
+    if distance == "wasserstein":
+
+        try:
+
+            d_ij = wasserstein_distance(pdgm_i, pdgm_j)
+
+        except IndexError:
+
+            print(f"\nIndexError at pdgms: {matrix_index}\n")
+
+            d_ij = np.nan
+
+    elif distance == "bottleneck":
+
+        try:
+
+            d_ij = bottleneck_distance(pdgm_i, pdgm_j)
+
+        except IndexError:
+
+            print(f"\nIndexError at pdgms: {matrix_index}\n")
+
+            d_ij = np.nan
+
+    matrix_distance[j, i] = d_ij
+    matrix_distance[i, j] = d_ij

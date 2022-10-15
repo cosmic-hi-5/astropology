@@ -1,71 +1,47 @@
 import glob
+import cProfile
+import pstats
 
 from memory_profiler import profile
 import numpy as np
 
-from astropology.distance import bottleneck_distance, wasserstein_distance
-from astropology.signal import pd_signal
+from astropology.distance import bottleneck_distance
+from astropology.distance import wasserstein_distance
+from astropology.signal import pd_from_distance_matrix
+from astropology.signal import sparse_matrix_signal
+
+def distance(
+    signal_i: np.array, signal_j:np.array
+)->tuple[float, float]:
+
+    sparse_matrix_i = sparse_matrix_signal(signal_i)
+    pdgm_i = pd_from_distance_matrix(sparse_matrix_i)
+
+    sparse_matrix_j = sparse_matrix_signal(signal_j)
+    pdgm_j = pd_from_distance_matrix(sparse_matrix_j)
+
+    wd = wasserstein_distance(pdgm_i, pdgm_j)
+    bd = bottleneck_distance(pdgm_i, pdgm_j)
 
 @profile
-def list_pdgms(lcs):
+def mem_distance(
+    signal_i: np.array, signal_j:np.array
+)->tuple[float, float]:
 
-    pdgms = []
-    
-    for lc in lcs:
+    sparse_matrix_i = sparse_matrix_signal(signal_i)
+    pdgm_i = pd_from_distance_matrix(sparse_matrix_i)
 
-        pdgm = pd_signal(lc)
-        pdgms.append(pdgm)
+    sparse_matrix_j = sparse_matrix_signal(signal_j)
+    pdgm_j = pd_from_distance_matrix(sparse_matrix_j)
 
-    return pdgms 
-
-@profile
-def pair_wise_distance_matrix(diagrams: list, distance: str) -> np.array:
-
-    n_rows = len(diagrams)
-    distance_matrix = np.empty((n_rows, n_rows))
-    
-    for i, diagram_i in enumerate(diagrams):
-
-        for j, diagram_j in enumerate(diagrams):
-            
-            if i > j:
-                
-                continue
-                
-            elif i == j:
-                distance_matrix[j, i] = 0.
-                
-            else:
-                # set matching to False to return the
-                # wasserstein/bottlenec distance only
-
-                if distance == "wasserstein":
-                    
-                    distance_ij = wasserstein_distance(
-                        diagram_i, diagram_j, matching=False
-                    )
-                
-                elif distance == "bottleneck":
-
-                    distance_ij = bottleneck_distance(
-                        diagram_i, diagram_j, matching=False
-                    )
-
-                else:
-                    print(f"Not implemented {distance}")
-                    sys.exit()
-
-                distance_matrix[i, j] = distance_ij
-                distance_matrix[j, i] = distance_ij
-        
-    return distance_matrix
-
+    wd = wasserstein_distance(pdgm_i, pdgm_j)
+    bd = bottleneck_distance(pdgm_i, pdgm_j)
 
 if __name__ == "__main__":
 
     lc_names = glob.glob(
         "/home/edgar/astropology/data/agn_lcs/lcs/*.dat"
-    )
+    )[:2]
 
     lcs = []
 
@@ -74,10 +50,14 @@ if __name__ == "__main__":
         lc = np.loadtxt(fname)
 
         lcs.append(lc[:, 1])
+    
+    mem_distance(lcs[0], lcs[1])
 
-        if idx == 10: break
+    with cProfile.Profile() as pr:
 
-    pdgms = list_pdgms(lcs)
+        distance(lcs[0], lcs[1])
 
-    # _ = pair_wise_distance_matrix(pdgms, "bottleneck")
-    _ = pair_wise_distance_matrix(pdgms, "wasserstein")
+    stats = pstats.Stats(pr)
+    stats.sort_stats(pstats.SortKey.TIME)
+    # stats.print_stats()
+    stats.dump_stats(filename="/home/edgar/Downloads/distance.prof")

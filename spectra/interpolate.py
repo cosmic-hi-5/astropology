@@ -26,7 +26,7 @@ if __name__ == "__main__":
     config_file = ConfigurationFile()
 
     # A load data frame with meta data
-    data_directory = parser.get("directory", "meta_data")
+    data_directory = parser.get("directory", "data")
 
     spectra_df_name = parser.get("files", "spectra_df")
     spectra_df = pd.read_csv(

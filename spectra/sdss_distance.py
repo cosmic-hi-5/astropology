@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
     save_to = parser.get("directory", "save_to")
 
-    matrix_name = f"agn_{distance}_{number_spectra}_sdss"
+    matrix_name = f"sdss_{distance}_{number_spectra}"
 
     np.save(
         f"{data_directory}/{matrix_name}.npy",

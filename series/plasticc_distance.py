@@ -15,8 +15,12 @@ from astropology.parrallel import raw_array_to_numpy
 from astropology.parrallel import share_data
 
 mean_norm = lambda flux: flux / np.nanmean(np.abs(flux))
-max_norm = lambda flux: flux / np.nanmax(np.abs(flux))
-min_max_norm = lambda flux: flux / (np.nanmax(flux) - np.nanmin(flux))
+
+def min_max_norm(flux:np.array):
+
+    flux = (flux - np.nanmin(flux))/(np.nanmax(flux) - np.nanmin(flux))
+
+    return flux
 
 f_normalization = {
     "mean": mean_norm, "max": max_norm, "min_max": min_max_norm

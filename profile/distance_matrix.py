@@ -10,9 +10,8 @@ from astropology.distance import wasserstein_distance
 from astropology.signal import pd_from_distance_matrix
 from astropology.signal import sparse_matrix_signal
 
-def distance(
-    signal_i: np.array, signal_j:np.array
-)->tuple[float, float]:
+
+def distance(signal_i: np.array, signal_j: np.array) -> tuple[float, float]:
 
     sparse_matrix_i = sparse_matrix_signal(signal_i)
     pdgm_i = pd_from_distance_matrix(sparse_matrix_i)
@@ -22,11 +21,12 @@ def distance(
 
     wd = wasserstein_distance(pdgm_i, pdgm_j)
     bd = bottleneck_distance(pdgm_i, pdgm_j)
+
 
 @profile
 def mem_distance(
-    signal_i: np.array, signal_j:np.array
-)->tuple[float, float]:
+    signal_i: np.array, signal_j: np.array
+) -> tuple[float, float]:
 
     sparse_matrix_i = sparse_matrix_signal(signal_i)
     pdgm_i = pd_from_distance_matrix(sparse_matrix_i)
@@ -37,11 +37,10 @@ def mem_distance(
     wd = wasserstein_distance(pdgm_i, pdgm_j)
     bd = bottleneck_distance(pdgm_i, pdgm_j)
 
+
 if __name__ == "__main__":
 
-    lc_names = glob.glob(
-        "/home/edgar/astropology/data/agn_lcs/lcs/*.dat"
-    )[:2]
+    lc_names = glob.glob("/home/edgar/astropology/data/agn_lcs/lcs/*.dat")[:2]
 
     lcs = []
 
@@ -50,7 +49,7 @@ if __name__ == "__main__":
         lc = np.loadtxt(fname)
 
         lcs.append(lc[:, 1])
-    
+
     mem_distance(lcs[0], lcs[1])
 
     with cProfile.Profile() as pr:

@@ -12,9 +12,8 @@ from astropology.distance import bottleneck_distance
 from astropology.distance import wasserstein_distance
 from astropology.signal import pd_signal
 
-def raw_array_to_numpy(
-    array: RawArray, array_shape: tuple=None
-) -> np.array:
+
+def raw_array_to_numpy(array: RawArray, array_shape: tuple = None) -> np.array:
 
     """Create a numpy array backed by a shared memory Array."""
 
@@ -43,8 +42,9 @@ def share_data(
 
     matrix_distance = raw_array_to_numpy(
         array=shared_matrix[0],
-        array_shape= (shared_matrix[1], shared_matrix[1])
+        array_shape=(shared_matrix[1], shared_matrix[1]),
     )
+
 
 def fill_distance_matrix(matrix_index: tuple, distance: str):
 
@@ -56,7 +56,7 @@ def fill_distance_matrix(matrix_index: tuple, distance: str):
 
         print(
             f"[{counter_value}] Compute matrix element: {matrix_index}",
-            end="\r"
+            end="\r",
         )
 
     i = matrix_index[0]
@@ -105,7 +105,7 @@ def share_spectra(
 
     spectra = raw_array_to_numpy(
         array=shared_spectra[1],
-        array_shape= (shared_spectra[2], shared_spectra[3])
+        array_shape=(shared_spectra[2], shared_spectra[3]),
     )
 
     spectra[...] = np.load(shared_spectra[0])
@@ -114,8 +114,9 @@ def share_spectra(
 
     matrix_distance = raw_array_to_numpy(
         array=shared_matrix[0],
-        array_shape= (shared_matrix[1], shared_matrix[1])
+        array_shape=(shared_matrix[1], shared_matrix[1]),
     )
+
 
 def fill_spectra_distance(matrix_index: tuple, distance: str):
 
@@ -127,7 +128,7 @@ def fill_spectra_distance(matrix_index: tuple, distance: str):
 
         print(
             f"[{counter_value}] Compute matrix element: {matrix_index}",
-            end="\r"
+            end="\r",
         )
 
     i = matrix_index[0]

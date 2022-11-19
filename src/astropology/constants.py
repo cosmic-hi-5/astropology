@@ -1,10 +1,10 @@
 """Constant variables used thorught out the library"""
 
 # plasticc data
-PASSBANDS = {"u":0, "g":1, "r":2, "i":3, "z":4, "y":5}
+PASSBANDS = {"u": 0, "g": 1, "r": 2, "i": 3, "z": 4, "y": 5}
 
 CLASSES = {
-    90 : "SNIa",
+    90: "SNIa",
     67: "SNIa-91bg",
     52: "SNIax",
     42: "SNII",
@@ -25,4 +25,3 @@ CLASSES = {
     994: "PISN",
     995: "µLens-String",
 }
-

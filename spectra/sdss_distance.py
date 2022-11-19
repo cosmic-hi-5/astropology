@@ -32,8 +32,7 @@ if __name__ == "__main__":
 
     # share array of spectra
     number_spectra, number_waves = np.load(
-        f"{data_directory}/{data_name}",
-        mmap_mode="r"
+        f"{data_directory}/{data_name}", mmap_mode="r"
     ).shape
 
     parser_n_spectra = parser.getint("config", "number_spectra")
@@ -45,13 +44,13 @@ if __name__ == "__main__":
     print("Set shared memory")
 
     # "f" means float32
-    spectra = RawArray("f", number_spectra*number_waves)
+    spectra = RawArray("f", number_spectra * number_waves)
 
     # build grid for parallel computations
-    matrix_distance = RawArray("f", number_spectra**2)
+    matrix_distance = RawArray("f", number_spectra ** 2)
 
     x = np.arange(number_spectra)
-    matrix_ij_grid = [(i, j) for i in x for j in x if j>i]
+    matrix_ij_grid = [(i, j) for i in x for j in x if j > i]
 
     distance = parser.get("config", "distance")
     print(f"Compute {distance} distances for {number_spectra} series")
@@ -73,7 +72,12 @@ if __name__ == "__main__":
         initializer=share_spectra,
         initargs=(
             counter,
-            (f"{data_directory}/{data_name}", spectra, number_spectra, number_waves),
+            (
+                f"{data_directory}/{data_name}",
+                spectra,
+                number_spectra,
+                number_waves,
+            ),
             (matrix_distance, number_spectra),
         ),
     ) as pool:
@@ -95,10 +99,7 @@ if __name__ == "__main__":
 
     matrix_name = f"sdss_{distance}_{number_spectra}"
 
-    np.save(
-        f"{data_directory}/{matrix_name}.npy",
-        matrix_distance
-    )
+    np.save(f"{data_directory}/{matrix_name}.npy", matrix_distance)
 
     finish_time = time.perf_counter()
 

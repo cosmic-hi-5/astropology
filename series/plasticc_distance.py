@@ -16,15 +16,15 @@ from astropology.parrallel import share_data
 
 mean_norm = lambda flux: flux / np.nanmean(np.abs(flux))
 
-def min_max_norm(flux:np.array):
 
-    flux = (flux - np.nanmin(flux))/(np.nanmax(flux) - np.nanmin(flux))
+def min_max_norm(flux: np.array):
+
+    flux = (flux - np.nanmin(flux)) / (np.nanmax(flux) - np.nanmin(flux))
 
     return flux
 
-f_normalization = {
-    "mean": mean_norm, "max": max_norm, "min_max": min_max_norm
-}
+
+f_normalization = {"mean": mean_norm, "max": max_norm, "min_max": min_max_norm}
 
 if __name__ == "__main__":
 
@@ -43,19 +43,18 @@ if __name__ == "__main__":
 
     df = pd.read_csv(f"{data_directory}/{data_name}")
 
-
     # Get dictionary with time series
     band = parser.get("config", "band")
     number_series = parser.getint("config", "number_series")
 
-    df = df.loc[df["passband"]==PASSBANDS[band]]
+    df = df.loc[df["passband"] == PASSBANDS[band]]
 
     object_ids = np.unique(df["object_id"])
 
     if number_series != -1:
 
         np.random.shuffle(object_ids)
-        object_ids = object_ids[: number_series]
+        object_ids = object_ids[:number_series]
 
     else:
 
@@ -71,7 +70,7 @@ if __name__ == "__main__":
         idx_objid[idx, 0] = idx
         idx_objid[idx, 1] = object_id
 
-        id_mask = object_id == df['object_id']
+        id_mask = object_id == df["object_id"]
 
         lcs[idx] = df.loc[id_mask, "flux"].to_numpy()
 
@@ -82,9 +81,9 @@ if __name__ == "__main__":
     if mask_negative is True:
 
         for key, value in lcs.items():
-            
+
             value = value[value >= 0]
-            lcs[key] = value            
+            lcs[key] = value
 
     # Normalize
     normalization = parser.get("config", "normalization")
@@ -98,13 +97,12 @@ if __name__ == "__main__":
             value = f_normalization[normalization](value)
             lcs[key] = value
 
-
     # build grid for parallel computations
     # "f" means float32
-    matrix_distance = RawArray("f", number_series**2)
+    matrix_distance = RawArray("f", number_series ** 2)
 
     x = np.arange(number_series)
-    matrix_ij_grid = [(i, j) for i in x for j in x if j>i]
+    matrix_ij_grid = [(i, j) for i in x for j in x if j > i]
 
     distance = parser.get("config", "distance")
     print(f"Compute {distance} distances for {number_series} series\n")
@@ -152,16 +150,9 @@ if __name__ == "__main__":
     if mask_negative is True:
         matrix_name = f"{matrix_name}_mask_negative"
 
-    np.save(
-        f"{data_directory}/{matrix_name}.npy",
-        matrix_distance
-    )
+    np.save(f"{data_directory}/{matrix_name}.npy", matrix_distance)
 
-    np.save(
-        f"{data_directory}/objid_{matrix_name}.npy",
-        idx_objid
-    )
-
+    np.save(f"{data_directory}/objid_{matrix_name}.npy", idx_objid)
 
     finish_time = time.perf_counter()
 

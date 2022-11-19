@@ -85,11 +85,11 @@ class Interpolate(FileDirectory, MetaData):
     def interpolate(self, specobjid: int) -> tuple:
         """
         Interpolate a single spectrum
-        
+
         INPUTS
         specobjid: specobj of a spectrum, the name of the file
             with raw data is f'{raw_data_directory}/{specobjid}.npy'
-        
+
         OUTPUT
         spectrum, variance: interpolated spectrum and its variance
             over the common grid
@@ -166,7 +166,7 @@ class Interpolate(FileDirectory, MetaData):
     ) -> np.array:
         """
         Set to NaN fluxes with large variance in their measurements
-        
+
         INPUT
         flux: raw spectrum
         ivar: inverse of variance for fluxe measurements of spectrum
@@ -200,7 +200,7 @@ class Interpolate(FileDirectory, MetaData):
         """
         Convert from observer frame to rest frame according to
         redshift of galaxy
-        
+
         INPUTS
         wave: wavelegths in observer frame
         z: redshift

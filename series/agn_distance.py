@@ -54,18 +54,19 @@ if __name__ == "__main__":
         print(f"Load data of: {object_id}", end="\r")
 
         lc_data = np.loadtxt(f"{data_directory}/lcs/{f_name}")
-        
+
         # 0-> mjd, 1 -> mag, 2-> mag_error
         lcs[idx] = lc_data[:, 1]
 
-        if idx + 1 == number_series: break
+        if idx + 1 == number_series:
+            break
 
     # build grid for parallel computations
     # "f" means float32
-    matrix_distance = RawArray("f", number_series**2)
+    matrix_distance = RawArray("f", number_series ** 2)
 
     x = np.arange(number_series)
-    matrix_ij_grid = [(i, j) for i in x for j in x if j>i]
+    matrix_ij_grid = [(i, j) for i in x for j in x if j > i]
 
     distance = parser.get("config", "distance")
     print(f"Compute {distance} distances for {number_series} series")
@@ -107,16 +108,9 @@ if __name__ == "__main__":
 
     matrix_name = f"agn_{distance}_{number_series}_series"
 
-    np.save(
-        f"{data_directory}/{matrix_name}.npy",
-        matrix_distance
-    )
+    np.save(f"{data_directory}/{matrix_name}.npy", matrix_distance)
 
-    np.save(
-        f"{data_directory}/objid_{matrix_name}.npy",
-        object_ids
-    )
-
+    np.save(f"{data_directory}/objid_{matrix_name}.npy", object_ids)
 
     finish_time = time.perf_counter()
 

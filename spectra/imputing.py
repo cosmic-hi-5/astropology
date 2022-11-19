@@ -39,9 +39,7 @@ variance_of_spectra = np.load(f"{data_directory}/{variance_file_name}")
 # mask spectra of science df
 specobjids = spectra_df.index.to_numpy()
 
-mask_spectra = np.isin(
-    track_indexes[:, 1], specobjids, assume_unique=True
-)
+mask_spectra = np.isin(track_indexes[:, 1], specobjids, assume_unique=True)
 
 spectra = spectra[mask_spectra]
 track_indexes = track_indexes[mask_spectra]
@@ -86,8 +84,7 @@ spectra = spectra[:, keep_waves_mask]
 # Save variance of spectra after indefinite values removal
 variance_of_spectra = variance_of_spectra[:, keep_waves_mask]
 np.save(
-    f"{data_directory}/inputting_variance_spectra.npy",
-    variance_of_spectra
+    f"{data_directory}/inputting_variance_spectra.npy", variance_of_spectra
 )
 
 number_indefinite_values = np.count_nonzero(~np.isfinite(spectra))
@@ -97,9 +94,7 @@ print(f"Indefinite values after drop: {number_indefinite_values}")
 print(f"Set new wavelength grid")
 
 interpolation_config_file = parser.get("files", "interpolation_config")
-interpolation_parser = ConfigParser(
-    interpolation=ExtendedInterpolation()
-)
+interpolation_parser = ConfigParser(interpolation=ExtendedInterpolation())
 interpolation_parser.read(interpolation_config_file)
 
 config = ConfigurationFile()
@@ -111,7 +106,7 @@ grid_parametes = config.section_to_dictionary(
 wave = np.linspace(
     grid_parametes["lower"],
     grid_parametes["upper"],
-    grid_parametes["number_waves"]
+    grid_parametes["number_waves"],
 )
 
 wave = wave[keep_waves_mask]
@@ -125,7 +120,7 @@ nan_median = np.nanmedian(spectra, axis=1)
 spectra *= 1 / nan_median.reshape(-1, 1)
 
 indefinite_values_mask = ~np.isfinite(spectra)
-spectra[indefinite_values_mask] = 1.
+spectra[indefinite_values_mask] = 1.0
 
 np.save(f"{data_directory}/spectra.npy", spectra.astype(np.float32))
 

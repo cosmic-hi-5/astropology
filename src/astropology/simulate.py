@@ -5,11 +5,9 @@ from typing import Callable
 import numpy as np
 
 
-def random_remove_points(
-    signal_size: int, percentage:float
-)->np.array: 
-    '''
-    Generate mask to randomly remove a desired percentage of points of 
+def random_remove_points(signal_size: int, percentage: float) -> np.array:
+    """
+    Generate mask to randomly remove a desired percentage of points of
     points in the signal.
 
     INPUT:
@@ -19,13 +17,14 @@ def random_remove_points(
 
     OUTPUT:
     remove_mask: boolean mask for the removal of elements in the signal
-    '''
-    
+    """
+
     random_numbers = np.random.random(signal_size)
-    
-    remove_mask = random_numbers > (percentage / 100.) 
-    
+
+    remove_mask = random_numbers > (percentage / 100.0)
+
     return remove_mask
+
 
 def time_series(
     signal_function: Callable,
@@ -33,7 +32,7 @@ def time_series(
     number_samples: int,
     variance: float,
     mean_dt: float,
-    irregular_dt: float
+    irregular_dt: float,
 ) -> tuple[np.array, np.array, bool]:
     """
     Generate a time series according to input function
@@ -41,7 +40,7 @@ def time_series(
 
     INPUT:
     signal_function: function to generate signal, it must accept a
-        time grid and a period as arguments  
+        time grid and a period as arguments
     period: period of the signal
     number_samples: number of sample points
     variance: variance of the signal points
@@ -56,9 +55,9 @@ def time_series(
 
     """
 
-    if (number_samples * mean_dt) < 1.:
+    if (number_samples * mean_dt) < 1.0:
 
-        print('Warning: the signal lasts less than one period')
+        print("Warning: the signal lasts less than one period")
 
     dt = np.ones(number_samples)
 
@@ -69,21 +68,24 @@ def time_series(
 
     else:
 
-        dt += np.abs(
-            np.random.normal(
-                loc=0 ,scale=irregular_dt,
-                size=number_samples
+        dt += (
+            np.abs(
+                np.random.normal(
+                    loc=0, scale=irregular_dt, size=number_samples
+                )
             )
-        ) * mean_dt * period
+            * mean_dt
+            * period
+        )
 
         regular_grid = False
-    
+
     t = np.cumsum(dt)
 
     signal = signal_function(t, period)
-    
+
     signal += np.random.normal(
         loc=0, scale=np.sqrt(variance), size=number_samples
     )
 
-    return t , signal, regular_grid 
+    return t, signal, regular_grid

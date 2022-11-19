@@ -51,7 +51,8 @@ def rank_to_object_id(
         rank=0 is the least anomalous, while rank=-1 is the most
         anomalous.
     score: the anomaly score from which the rank is computed.
-    idx_objid_map: array with map between the light curve index in the score array and the object_id of the light curve.
+    idx_objid_map: array with map between the light curve
+        index in the score array and the object_id of the light curve.
 
     OUTPUT
     object_id: unique identifier of the light curve.

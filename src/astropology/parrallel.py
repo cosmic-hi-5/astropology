@@ -6,7 +6,6 @@ spectra using cpu parallelization
 import multiprocessing as mp
 from multiprocessing.sharedctypes import RawArray
 import numpy as np
-import sys
 
 from astropology.distance import bottleneck_distance
 from astropology.distance import wasserstein_distance
@@ -30,7 +29,11 @@ def share_data(
     shared_counter: mp.Value,
     shared_lcs: dict,
     shared_matrix: tuple,
-):
+) -> None:
+    """
+    Share light curves among child processes durting distance
+    matrix element wise computations
+    """
 
     global lcs
     global counter
@@ -46,7 +49,16 @@ def share_data(
     )
 
 
-def fill_distance_matrix(matrix_index: tuple, distance: str):
+def fill_distance_matrix(matrix_index: tuple, distance: str) -> None:
+    """
+    Compute distance between signal i and j and fill in the
+    distance matrix
+
+    INPUT
+    matrix_index: (i, j) element in the matrix distance
+    distance: either the Wasserstein or Bottleneck distance
+        between signal i and j
+    """
 
     with counter.get_lock():
 
@@ -97,7 +109,11 @@ def share_spectra(
     shared_counter: mp.Value,
     shared_spectra: tuple[str, RawArray, int, int],
     shared_matrix: tuple[RawArray, int],
-):
+) -> None:
+    """
+    Share light curves among child processes durting distance
+    matrix element wise computations
+    """
 
     global spectra
     global counter
@@ -118,8 +134,16 @@ def share_spectra(
     )
 
 
-def fill_spectra_distance(matrix_index: tuple, distance: str):
+def fill_spectra_distance(matrix_index: tuple, distance: str) -> None:
+    """
+    Compute distance between spectrum i and j and fill in the
+    distance matrix
 
+    INPUT
+    matrix_index: (i, j) element in the matrix distance
+    distance: either the Wasserstein or Bottleneck distance
+        between signal i and j
+    """
     with counter.get_lock():
 
         counter_value = counter.value

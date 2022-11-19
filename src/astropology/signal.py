@@ -5,7 +5,17 @@ from ripser import ripser
 from scipy import sparse
 
 
-def pd_from_distance_matrix(distance_matrix: sparse.coo_matrix):
+def pd_from_distance_matrix(distance_matrix: sparse.coo_matrix) -> np.array:
+    """
+    Compute persistence diagrama of a signal using the
+    distance matrix of if from the lower star filtration method
+
+    INPUT:
+    distance_matrix: sparce matrix from lower star filtration method
+
+    OUTPUT
+    dgm_0: birth and death diagram of 0-homology of the signal
+    """
 
     dgm_0 = ripser(distance_matrix, maxdim=0, distance_matrix=True)["dgms"][0]
 
@@ -51,8 +61,17 @@ def sparse_matrix_signal(signal: np.array) -> np.array:
     return distance_matrix
 
 
-def pd_signal(signal):
+def pd_signal(signal: np.array) -> np.array:
+    """
+    Compute persistence diagram of the 0-homology of a
+    signal using the lower star filtration method
 
+    INPUT:
+    signal: either time serie or spectra
+
+    OUTPUT
+    pd: birth and death diagram of 0-homology of the signal
+    """
     distance_matrix = sparse_matrix_signal(signal)
     pd = pd_from_distance_matrix(distance_matrix)
 

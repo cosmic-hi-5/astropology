@@ -1,4 +1,5 @@
 # data directory
+*.pdf
 data/
 img/
 # Byte-compiled / optimized / DLL files

@@ -1,4 +1,5 @@
 # data directory
+paper/
 *.pdf
 data/
 img/
